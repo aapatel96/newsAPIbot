@@ -307,6 +307,7 @@ def nextButton(bot,update):
     queryData = update.callback_query.data
     bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
     mid = queryObj.message.message_id
+    queryObj.message.reply_text(str(queryObj.from_user.id),reply_markup=news_keyboard)
 
     userfind = find_user(users,queryObj.from_user.id)
     if userfind == None:
