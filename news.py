@@ -288,7 +288,7 @@ def whatNews(bot,update):
             url = newsapi+code+topnews
             response = urllib.urlopen(url)
             data = json.loads(response.read())
-            console.info(str(data))
+            logging.info(str(data))
             x = ''
             userfind.currentList = data.values()[3]
             userfind.currentIndex = 0
