@@ -308,6 +308,8 @@ def nextButton(bot,update):
     queryData = update.callback_query.data
     bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
     mid = queryObj.message.message_id
+    print str(queryObj.message.chat.id)
+    print '\n'
     userfind = find_user(users,queryObj.message.chat.id)
     if userfind == None:
         queryObj.message.reply_text("Please type /start and then resend command")
