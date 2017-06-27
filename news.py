@@ -113,7 +113,9 @@ def find_user(users, user_id):
 def start(bot, update):
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Welcome to News bot")
+    bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
+    bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
     users.append(user(update.message.from_user.id))   
     
@@ -261,7 +263,6 @@ def hn(bot,update):
     update.message.reply_text(x)
 
 def whatNews(bot,update):
-    bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
 
     userfind = find_user(users,update.message.from_user.id)
     
@@ -303,6 +304,7 @@ def whatNews(bot,update):
 ##              x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
 
             update.message.reply_text(x,reply_markup=inlineNextKeyboard1,parse_mode='HTML')
+    return
 
 def nextButton(bot,update):
     print update
