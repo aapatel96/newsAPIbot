@@ -10,6 +10,7 @@ import logging
 import urllib
 from telegram.chataction import ChatAction
 import time
+from random import randint
 
 try:
     import apiai
@@ -83,6 +84,14 @@ class user:
         self.currentList = None
         self.currentIndex = None
         self.lists = {}
+        self.listIDs= []
+
+class newslist:
+    def __init__(self,uid,code):
+        self.uid = uid
+        self.code = code
+        self.currentList = None
+        self.currentIndex = None
 
             
 
@@ -114,6 +123,7 @@ def start(bot, update):
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Welcome to News bot")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
+    time.sleep(2)
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
@@ -286,6 +296,13 @@ def whatNews(bot,update):
         else:
             code = JSON['result']['parameters']['Newsource']
             logging.info(code)
+            listID = randint(10000,99999)
+            while listID in userfind.listIDs:
+                listID = randint(10000,99999)
+                
+            userfind.listIDs.append(listID)
+            
+            newsList = newslist(listID,code)
             
             userfind.currentCode = code
             url = newsapi+code+topnews
@@ -293,11 +310,17 @@ def whatNews(bot,update):
             data = json.loads(response.read())
             logging.info(str(data))
             x = ''
+            
             userfind.currentList = data['articles']
+            newsList.currentList = data['articles']
             userfind.currentIndex = 0
+            newsList.currentIndex = 0
+
+            userfind.lists[listID] = newsList
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             logger.info(str(userfind.currentList))
-            x = userfind.currentList[userfind.currentIndex]['url']
+            
+            x = "QUERY"+str(listID)+'\n'+'\n'userfind.currentList[userfind.currentIndex]['url']
             
 ##          for i in data.values()[3]:
 ##              listx = i.values()
@@ -311,37 +334,43 @@ def nextButton(bot,update):
     query = update.callback_query.id
     queryObj = update.callback_query
     queryData = update.callback_query.data
-    bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
+    text =  message=update.callback_query.message.text
+    textComps = text.split('\n')
+    listID = int(textComps[0][5:])
+
+
     mid = queryObj.message.message_id
     userfind = find_user(users,queryObj.message.chat.id)
     if userfind == None:
         queryObj.message.reply_text("Please type /start and then resend command")
         return ConversationHandler.END
-    if str(queryData) == "3":
-        time.sleep(2)
-        bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
-        bot.edit_message_text(text="ok...",
-                      chat_id=queryObj.message.chat_id,
-                      message_id=mid)
-        time.sleep(2)
-        bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
-        queryObj.message.reply_text("Choose from below:",reply_markup=news_keyboard)
-        return
+##    if str(queryData) == "3":
+##        time.sleep(2)
+##        bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
+##        bot.edit_message_text(text="ok...",
+##                      chat_id=queryObj.message.chat_id,
+##                      message_id=mid)
+##        time.sleep(2)
+##        bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
+##        queryObj.message.reply_text("Choose from below:",reply_markup=news_keyboard)
+##        return
     if str(queryData) == "2":
+        userfind.lists[listID].currentIndex = userfind.lists[listID].currentIndex -1
         userfind.currentIndex = userfind.currentIndex - 1
 
     if str(queryData) == "1":
+        userfind.lists[listID].currentIndex = userfind.lists[listID].currentIndex +1
         userfind.currentIndex = userfind.currentIndex + 1
-    if userfind.currentIndex == 0:
+    if userfind.lists[listID].currentIndex == 0:
         keyboard = inlineNextKeyboard1
-    if userfind.currentIndex == len(userfind.currentList)-1:
+    if userfind.lists[listID].currentIndex == len(userfind.currentList)-1:
         keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
         
 ##    x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-    x = userfind.currentList[userfind.currentIndex]['url']
-
+    x = "QUERY"+str(listID)+'\n'+'\n'+userfind.currentList[userfind.currentIndex]['url']
+    y = "QUERY"+str(listID)+'\n'+'\n'+userfind.lists[listID].currentList[userfind.lists[listID].currentIndex]['url']
 
     bot.edit_message_text(text=x,
                       chat_id=queryObj.message.chat_id,
@@ -390,12 +419,12 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+##    updater.start_webhook(listen="0.0.0.0",
+##                      port=PORT,
+##                      url_path=TOKEN)
+##    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-##    updater.start_polling()
+    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
