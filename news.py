@@ -327,6 +327,8 @@ def nextButton(bot,update):
 
     if str(queryData) == "1":
         userfind.currentIndex = userfind.currentIndex + 1
+    x = userfind.currentList[userfind.currentIndex]['url']
+
     bot.edit_message_text(text=x,chat_id=queryObj.message.chat_id,message_id=mid)
     if userfind.currentIndex == 0:
         keyboard = inlineNextKeyboard1
@@ -337,12 +339,7 @@ def nextButton(bot,update):
 
         
 ##    x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-    x = userfind.currentList[userfind.currentIndex]['url']
-
-
-
-    bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
-        
+    return        
 
 
 
