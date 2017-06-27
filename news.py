@@ -85,12 +85,12 @@ def error(bot, update, error):
 
 users = []
 
-chatidFile = open("chatids.txt","r")
-lines = chatidFile.readlines()
-content = [x.strip() for x in lines] 
-content = [int(x)  for x in content]
-for i in content:
-    users.append(user(content))
+##chatidFile = open("chatids.txt","r")
+##lines = chatidFile.readlines()
+##content = [x.strip() for x in lines] 
+##content = [int(x)  for x in content]
+##for i in content:
+##    users.append(user(content))
 
     
 
