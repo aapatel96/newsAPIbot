@@ -291,6 +291,7 @@ def whatNews(bot,update):
             userfind.currentList = data.values()[3]
             userfind.currentIndex = 0
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
+            print userfind.currentList[userfind.currentIndex]
             x = userfind.currentList[userfind.currentIndex].values()[2]
             
 ##          for i in data.values()[3]:
