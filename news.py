@@ -12,6 +12,7 @@ from telegram.chataction import ChatAction
 import time
 import psycopg2
 from random import randint
+import urlparse
 
 try:
     import apiai
