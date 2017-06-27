@@ -292,7 +292,7 @@ def whatNews(bot,update):
             userfind.currentIndex = 0
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             print userfind.currentList[userfind.currentIndex]
-            x = userfind.currentList[userfind.currentIndex].values()[2]
+            x = userfind.currentList[userfind.currentIndex]['url']
             
 ##          for i in data.values()[3]:
 ##              listx = i.values()
@@ -385,12 +385,12 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+##    updater.start_webhook(listen="0.0.0.0",
+##                      port=PORT,
+##                      url_path=TOKEN)
+##    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-##    updater.start_polling()
+    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
