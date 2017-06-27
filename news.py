@@ -294,7 +294,7 @@ def whatNews(bot,update):
             userfind.currentIndex = 0
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             logger.info(str(userfind.currentList))
-            print userfind.currentList[userfind.currentIndex]
+            3g userfind.currentList[userfind.currentIndex]
             x = userfind.currentList[userfind.currentIndex]['url']
             
 ##          for i in data.values()[3]:
@@ -310,7 +310,6 @@ def nextButton(bot,update):
     queryData = update.callback_query.data
     bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
     mid = queryObj.message.message_id
-    queryObj.message.reply_text(str(queryObj.from_user.id),reply_markup=news_keyboard)
 
     userfind = find_user(users,queryObj.from_user.id)
     if userfind == None:
