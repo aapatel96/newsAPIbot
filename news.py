@@ -82,6 +82,7 @@ class user:
         self.currentCode = None
         self.currentList = None
         self.currentIndex = None
+        self.lists = {}
 
             
 
@@ -111,7 +112,9 @@ def find_user(users, user_id):
 
 def start(bot, update):
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
-    update.message.reply_text("Yo...chose from below:",reply_markup=news_keyboard)
+    update.message.reply_text("Welcome to News bot")
+    update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
+    update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
     users.append(user(update.message.from_user.id))   
     
 def help(bot, update):
@@ -285,7 +288,6 @@ def whatNews(bot,update):
             response = urllib.urlopen(url)
             data = json.loads(response.read())
             x = ''
-##          print data.values()[3]
             userfind.currentList = data.values()[3]
             userfind.currentIndex = 0
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
@@ -304,16 +306,11 @@ def nextButton(bot,update):
     queryData = update.callback_query.data
     bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
     mid = queryObj.message.message_id
-    print query
-    print queryObj
+
     userfind = find_user(users,queryObj.from_user.id)
-    print userfind
     if userfind == None:
         queryObj.message.reply_text("Please type /start and then resend command")
         return ConversationHandler.END
-    print "hi"
-    print queryData
-    print str(queryData)
     if str(queryData) == "3":
         time.sleep(2)
         bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
@@ -325,11 +322,9 @@ def nextButton(bot,update):
         queryObj.message.reply_text("Choose from below:",reply_markup=news_keyboard)
         return
     if str(queryData) == "2":
-        print "reached branch"
         userfind.currentIndex = userfind.currentIndex - 1
 
     if str(queryData) == "1":
-        print "reached branch"
         userfind.currentIndex = userfind.currentIndex + 1
     if userfind.currentIndex == 0:
         keyboard = inlineNextKeyboard1
@@ -341,7 +336,6 @@ def nextButton(bot,update):
 ##    x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
     x = userfind.currentList[userfind.currentIndex].values()[2]
 
-    print x
 
     bot.edit_message_text(text=x,
                       chat_id=queryObj.message.chat_id,
