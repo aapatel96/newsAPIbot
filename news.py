@@ -277,6 +277,7 @@ def whatNews(bot,update):
         request.session_id = update.message.chat_id
         request.query = update.message.text
         response = request.getresponse()
+        print response
         JSON= json.loads(response.read().decode())
         if JSON['result']['metadata']['intentName'] != 'smaug.news':
             update.message.reply_text("hmmm...did not get that...choose from below please",reply_markup=news_keyboard)
