@@ -331,9 +331,11 @@ def nextButton(bot,update):
         userfind.currentIndex = userfind.currentIndex + 1
 
     if userfind.currentIndex == 0:
+        queryObj.message.reply_text("0",reply_markup=news_keyboard)
         keyboard = inlineNextKeyboard1
         bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
     if userfind.currentIndex == len(userfind.currentList)-1:
+        queryObj.message.reply_text("1",reply_markup=news_keyboard)
         keyboard = inlineNextKeyboard3
         bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
     x = userfind.currentList[userfind.currentIndex]['url']
