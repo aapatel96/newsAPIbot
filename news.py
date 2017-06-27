@@ -290,7 +290,7 @@ def whatNews(bot,update):
             data = json.loads(response.read())
             logging.info(str(data))
             x = ''
-            userfind.currentList = data.values()[3]
+            userfind.currentList = data['articles']
             userfind.currentIndex = 0
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             logger.info(str(userfind.currentList))
