@@ -115,6 +115,7 @@ def start(bot, update):
     update.message.reply_text("Welcome to News bot")
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
+    update.message.reply_text(str(update.message.from_user.id))
     users.append(user(update.message.from_user.id))   
     
 def help(bot, update):
