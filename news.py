@@ -338,7 +338,7 @@ def nextButton(bot,update):
         keyboard = inlineNextKeyboard2
         
 ##    x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-    x = userfind.currentList[userfind.currentIndex].values()[2]
+    x = userfind.currentList[userfind.currentIndex]['url']
 
 
     bot.edit_message_text(text=x,
