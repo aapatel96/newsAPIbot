@@ -10,6 +10,7 @@ import logging
 import urllib
 from telegram.chataction import ChatAction
 import time
+import psycopg2
 from random import randint
 
 try:
@@ -19,8 +20,24 @@ except ImportError:
         os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
     )
     import apiai
-APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
 
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ['DATABASE_URL'])
+
+try:
+
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+except:
+    print "I could not connect to the database"
+    
+APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
 
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
@@ -66,6 +83,15 @@ def error(bot, update, error):
 
 
 users = []
+
+chatidFile = open("chatids.txt","r")
+lines = chatidFile.readlines()
+content = [x.strip() for x in lines] 
+content = [int(x)  for x in content]
+for i in content:
+    users.append(user(content))
+
+    
 
 
 # Enable logging
@@ -127,6 +153,8 @@ def start(bot, update):
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
+    chatidFile = open("chatids.txt","a")
+    chatidFile.write(str(update.message.from_user.id)+'\n')
     users.append(user(update.message.from_user.id))   
     
 def help(bot, update):
@@ -320,7 +348,7 @@ def whatNews(bot,update):
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             logger.info(str(userfind.currentList))
             
-            x = "QUERY"+str(listID)+'\n'+'\n'userfind.currentList[userfind.currentIndex]['url']
+            x = "QUERY"+str(listID)+'\n'+'\n'+userfind.currentList[userfind.currentIndex]['url']
             
 ##          for i in data.values()[3]:
 ##              listx = i.values()
@@ -361,18 +389,22 @@ def nextButton(bot,update):
     if str(queryData) == "1":
         userfind.lists[listID].currentIndex = userfind.lists[listID].currentIndex +1
         userfind.currentIndex = userfind.currentIndex + 1
+    
     if userfind.lists[listID].currentIndex == 0:
+        print "1"
         keyboard = inlineNextKeyboard1
-    if userfind.lists[listID].currentIndex == len(userfind.currentList)-1:
+    elif userfind.lists[listID].currentIndex == len(userfind.currentList)-1:
+        print "3"
         keyboard = inlineNextKeyboard3
     else:
+        print "2"
         keyboard = inlineNextKeyboard2
-        
+    print keyboard
 ##    x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
     x = "QUERY"+str(listID)+'\n'+'\n'+userfind.currentList[userfind.currentIndex]['url']
     y = "QUERY"+str(listID)+'\n'+'\n'+userfind.lists[listID].currentList[userfind.lists[listID].currentIndex]['url']
 
-    bot.edit_message_text(text=x,
+    bot.edit_message_text(text=y,
                       chat_id=queryObj.message.chat_id,
                       message_id=mid)
     bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
@@ -419,12 +451,12 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
-##    updater.start_webhook(listen="0.0.0.0",
-##                      port=PORT,
-##                      url_path=TOKEN)
-##    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+    updater.start_webhook(listen="0.0.0.0",
+                      port=PORT,
+                      url_path=TOKEN)
+    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-    updater.start_polling()
+##    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
