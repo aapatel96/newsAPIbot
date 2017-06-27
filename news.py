@@ -304,7 +304,7 @@ def whatNews(bot,update):
             update.message.reply_text(x,reply_markup=inlineNextKeyboard1,parse_mode='HTML')
 
 def nextButton(bot,update):
-
+    print update
     query = update.callback_query.id
     queryObj = update.callback_query
     queryData = update.callback_query.data
