@@ -284,6 +284,8 @@ def whatNews(bot,update):
             return
         else:
             code = JSON['result']['parameters']['Newsource']
+            logging.info(code)
+            
             userfind.currentCode = code
             url = newsapi+code+topnews
             response = urllib.urlopen(url)
