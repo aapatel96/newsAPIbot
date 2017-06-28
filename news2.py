@@ -90,7 +90,6 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 
-users = []
 usersJ = {}
 
    
@@ -121,9 +120,7 @@ def start(bot, update):
 
     userJ = userformat
     usersJ[update.message.from_user.id]=userJ
-    
-    users.append(user(update.message.from_user.id))   
-    
+        
 def help(bot, update):
     update.message.reply_text(' newtask <taskname:priority:duedate> to create a task'+ '\n'
                               + ' mytasks to show tasks'+'\n'+ ' newhabit <habitname:priority>'+'\n'+ ' myhabits to show tasks'+'\n'+ ' deltask <taskid> to delete task by task id (you can find this out using /mytasks command)'
