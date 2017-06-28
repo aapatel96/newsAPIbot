@@ -25,19 +25,27 @@ except ImportError:
 
 
 urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ['DATABASE_URL'])
+##url = urlparse.urlparse(os.environ['DATABASE_URL'])
+##
+##try:
+##
+##    conn = psycopg2.connect(
+##        database=url.path[1:],
+##        user=url.username,
+##        password=url.password,
+##        host=url.hostname,
+##        port=url.port
+##    )
+##except:
+##    print "I could not connect to the database"
 
-try:
-
-    conn = psycopg2.connect(
-        database=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port
-    )
-except:
-    print "I could not connect to the database"
+##cur = conn.cursor()
+##cur.execute("select exists(select * from information_schema.tables where table_name=%s)", ('users',))
+##if cur.fetchone()[0]:
+##    cur.close()
+##else:
+##    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, id integer, lists varchar, );")
+##    
     
 APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
 
@@ -85,6 +93,7 @@ def error(bot, update, error):
 
 
 users = []
+usersJ = {}
 
 ##chatidFile = open("chatids.txt","r")
 ##lines = chatidFile.readlines()
@@ -104,6 +113,10 @@ logger = logging.getLogger(__name__)
 
 
 #classes
+
+userformat = {"listIDs":[],"lists":{}}
+
+newsListformat = {'code':None,'list':None,'index':None}
 
 class user:
     def __init__(self,user_id):
@@ -155,12 +168,10 @@ def start(bot, update):
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
-    chatidFile = open("chatids.txt","a")
-    chatidFile.write(str(update.message.from_user.id)+'\n')
-    cur = conn.cursor()
-    try:
-        message = "INSERT INTO users (id) VALUES " +str(update.message.from_user.id)
-        cur.execute(message)
+
+    userJ = userformat
+    usersJ[update.message.from_user.id]=userJ
+    
     users.append(user(update.message.from_user.id))   
     
 def help(bot, update):
@@ -307,12 +318,16 @@ def hn(bot,update):
     update.message.reply_text(x)
 
 def whatNews(bot,update):
-
-    userfind = find_user(users,update.message.from_user.id)
+    try:
+        userfind = usersJ[update.message.from_user.id]
+    except:
+        update.message.reply_text("You are not registered. Press /start and then resend command")
+        return ConversationHandler.END
     
     if userfind == None:
         update.message.reply_text("Please type /start and then resend command")
         return ConversationHandler.END
+    
     if update.message.text == "What do you think about the government?":
         update.message.reply_text("yeh government bik gayi hai")
         return ConversationHandler.END
@@ -331,30 +346,31 @@ def whatNews(bot,update):
             code = JSON['result']['parameters']['Newsource']
             logging.info(code)
             listID = randint(10000,99999)
-            while listID in userfind.listIDs:
+            while listID in userfind["listIDs"]:
                 listID = randint(10000,99999)
                 
-            userfind.listIDs.append(listID)
+            userfind["listIDs"].append(listID)
+            newsList = newsListformat
             
-            newsList = newslist(listID,code)
-            
-            userfind.currentCode = code
             url = newsapi+code+topnews
             response = urllib.urlopen(url)
             data = json.loads(response.read())
             logging.info(str(data))
             x = ''
             
-            userfind.currentList = data['articles']
-            newsList.currentList = data['articles']
-            userfind.currentIndex = 0
-            newsList.currentIndex = 0
 
-            userfind.lists[listID] = newsList
-##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-            logger.info(str(userfind.currentList))
             
-            x = "QUERY"+str(listID)+'\n'+'\n'+userfind.currentList[userfind.currentIndex]['url']
+            newsList['code']=code
+            newsList['list']=data['articles']
+            newsList['index']=0
+
+
+            userfind["listIDs"].append(listID)
+            userfind["lists"][listID]=newsList
+
+##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
+            
+            x = "QUERY"+str(listID)+'\n'+'\n'+userfind["lists"][listID]['list'][userfind["lists"][listID]['index']]['url']
             
 ##          for i in data.values()[3]:
 ##              listx = i.values()
@@ -364,7 +380,6 @@ def whatNews(bot,update):
     return
 
 def nextButton(bot,update):
-    print update
     query = update.callback_query.id
     queryObj = update.callback_query
     queryData = update.callback_query.data
@@ -372,45 +387,33 @@ def nextButton(bot,update):
     textComps = text.split('\n')
     listID = int(textComps[0][5:])
 
-
     mid = queryObj.message.message_id
-    userfind = find_user(users,queryObj.message.chat.id)
+    try:
+        userfind = usersJ[queryObj.message.chat.id]
+    except:
+        update.message.reply_text("You are not registered. Press /start and then resend command")
+        return ConversationHandler.END
     if userfind == None:
         queryObj.message.reply_text("Please type /start and then resend command")
         return ConversationHandler.END
-##    if str(queryData) == "3":
-##        time.sleep(2)
-##        bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
-##        bot.edit_message_text(text="ok...",
-##                      chat_id=queryObj.message.chat_id,
-##                      message_id=mid)
-##        time.sleep(2)
-##        bot.sendChatAction(queryObj.message.chat.id, ChatAction.TYPING)
-##        queryObj.message.reply_text("Choose from below:",reply_markup=news_keyboard)
-##        return
     if str(queryData) == "2":
-        userfind.lists[listID].currentIndex = userfind.lists[listID].currentIndex -1
-        userfind.currentIndex = userfind.currentIndex - 1
-
+        userfind['lists'][listID]['index'] = userfind['lists'][listID]['index'] -1
     if str(queryData) == "1":
-        userfind.lists[listID].currentIndex = userfind.lists[listID].currentIndex +1
-        userfind.currentIndex = userfind.currentIndex + 1
+        userfind['lists'][listID]['index'] = userfind['lists'][listID]['index'] +1
     
-    if userfind.lists[listID].currentIndex == 0:
+    if userfind['lists'][listID]['index'] == 0:
         print "1"
         keyboard = inlineNextKeyboard1
-    elif userfind.lists[listID].currentIndex == len(userfind.currentList)-1:
+    elif userfind['lists'][listID]['index'] == len(userfind['lists'][listID]['list'])-1:
         print "3"
         keyboard = inlineNextKeyboard3
     else:
         print "2"
         keyboard = inlineNextKeyboard2
     print keyboard
-##    x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-    x = "QUERY"+str(listID)+'\n'+'\n'+userfind.currentList[userfind.currentIndex]['url']
-    y = "QUERY"+str(listID)+'\n'+'\n'+userfind.lists[listID].currentList[userfind.lists[listID].currentIndex]['url']
+    x = "QUERY"+str(listID)+'\n'+'\n'+userfind["lists"][listID]['list'][userfind["lists"][listID]['index']]['url']
 
-    bot.edit_message_text(text=y,
+    bot.edit_message_text(text=x,
                       chat_id=queryObj.message.chat_id,
                       message_id=mid)
     bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
@@ -457,12 +460,12 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+##    updater.start_webhook(listen="0.0.0.0",
+##                      port=PORT,
+##                      url_path=TOKEN)
+##    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-##    updater.start_polling()
+    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
