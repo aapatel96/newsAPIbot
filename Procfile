@@ -1,1 +1,1 @@
-web: python news.py runserver 0.0.0.0:5000
+web: python news2.py runserver 0.0.0.0:5000

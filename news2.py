@@ -25,27 +25,27 @@ except ImportError:
 
 
 urlparse.uses_netloc.append("postgres")
-##url = urlparse.urlparse(os.environ['DATABASE_URL'])
-##
-##try:
-##
-##    conn = psycopg2.connect(
-##        database=url.path[1:],
-##        user=url.username,
-##        password=url.password,
-##        host=url.hostname,
-##        port=url.port
-##    )
-##except:
-##    print "I could not connect to the database"
+url = urlparse.urlparse(os.environ['DATABASE_URL'])
 
-##cur = conn.cursor()
-##cur.execute("select exists(select * from information_schema.tables where table_name=%s)", ('users',))
-##if cur.fetchone()[0]:
-##    cur.close()
-##else:
-##    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, id integer, lists varchar, );")
-##    
+try:
+
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+except:
+    print "I could not connect to the database"
+
+cur = conn.cursor()
+cur.execute("select exists(select * from information_schema.tables where table_name=%s)", ('users',))
+if cur.fetchone()[0]:
+    cur.close()
+else:
+    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, id integer, lists varchar, );")
+    
     
 APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
 
@@ -95,14 +95,7 @@ def error(bot, update, error):
 users = []
 usersJ = {}
 
-##chatidFile = open("chatids.txt","r")
-##lines = chatidFile.readlines()
-##content = [x.strip() for x in lines] 
-##content = [int(x)  for x in content]
-##for i in content:
-##    users.append(user(content))
-
-    
+   
 
 
 # Enable logging
@@ -179,144 +172,6 @@ def help(bot, update):
                               + ' mytasks to show tasks'+'\n'+ ' newhabit <habitname:priority>'+'\n'+ ' myhabits to show tasks'+'\n'+ ' deltask <taskid> to delete task by task id (you can find this out using /mytasks command)'
                               +'fintask ,<taskid> to delete task by task id (you can find this out using /mytasks command'+ '\n' +'delthabit <habitid> to delete habit by habit id (you can find this out using /myhabits command)' +"/help to get command list")
 
-# news related
-def news(bot, update):
-    url = newsapi+googlec+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-    bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
-    update.message.reply_text(x)
-
-
-def thehindu(bot, update):
-    url = newsapi+thehinduc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-
-def recode(bot, update):
-    url = newsapi+recodec+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def techcrunch(bot, update):
-    url = newsapi+techcrunchc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def theguardian(bot, update):
-    url = newsapi+guardianc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def theverge(bot, update):
-    url = newsapi+vergec+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def nyt(bot, update):
-    url = newsapi+nytc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def wapo(bot, update):
-    url = newsapi+wapoc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-
-def reuters(bot, update):
-    url = newsapi+reutersc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-
-def ap(bot, update):
-    url = newsapi+apc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def economist(bot, update):
-    url = newsapi+economistc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
-def hn(bot,update):
-    
-    url = newsapi+hnc+topnews
-    response = urllib.urlopen(url)
-    data = json.loads(response.read())
-    x = ''               
-    for i in data.values()[3]:
-        listx = i.values()
-        x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
-
-    update.message.reply_text(x)
-
 def whatNews(bot,update):
     try:
         userfind = usersJ[update.message.from_user.id]
@@ -337,7 +192,6 @@ def whatNews(bot,update):
         request.session_id = update.message.chat_id
         request.query = update.message.text
         response = request.getresponse()
-        print response
         JSON= json.loads(response.read().decode())
         if JSON['result']['metadata']['intentName'] != 'smaug.news':
             update.message.reply_text("hmmm...did not get that...choose from below please",reply_markup=news_keyboard)
@@ -402,24 +256,18 @@ def nextButton(bot,update):
         userfind['lists'][listID]['index'] = userfind['lists'][listID]['index'] +1
     
     if userfind['lists'][listID]['index'] == 0:
-        print "1"
         keyboard = inlineNextKeyboard1
     elif userfind['lists'][listID]['index'] == len(userfind['lists'][listID]['list'])-1:
-        print "3"
         keyboard = inlineNextKeyboard3
     else:
-        print "2"
         keyboard = inlineNextKeyboard2
-    print keyboard
     x = "QUERY"+str(listID)+'\n'+'\n'+userfind["lists"][listID]['list'][userfind["lists"][listID]['index']]['url']
 
     bot.edit_message_text(text=x,
                       chat_id=queryObj.message.chat_id,
                       message_id=mid)
     bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
-        
-
-
+    return
 
     
 def main():
@@ -439,33 +287,15 @@ def main():
     dp.add_handler(CallbackQueryHandler(nextButton))
 
     #news
-    dp.add_handler(CommandHandler("googlenews", news))
-    dp.add_handler(CommandHandler("thehindu", thehindu))
-    dp.add_handler(CommandHandler("recode", recode))
-    dp.add_handler(CommandHandler("techcrunch", techcrunch))
-    dp.add_handler(CommandHandler("theguardian", theguardian))
-    dp.add_handler(CommandHandler("theverge", theverge))
-    dp.add_handler(CommandHandler("nyt", nyt))
-    dp.add_handler(CommandHandler("wapo", wapo))
-    dp.add_handler(CommandHandler("reuters", reuters))
-    dp.add_handler(CommandHandler("ap", ap))
-    dp.add_handler(CommandHandler("economist", economist))
-    dp.add_handler(CommandHandler("hn", hn))
-
-
-
-
-
-
 
     # log all errors
     dp.add_error_handler(error)
-##    updater.start_webhook(listen="0.0.0.0",
-##                      port=PORT,
-##                      url_path=TOKEN)
-##    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+    updater.start_webhook(listen="0.0.0.0",
+                      port=PORT,
+                      url_path=TOKEN)
+    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-    updater.start_polling()
+##    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
