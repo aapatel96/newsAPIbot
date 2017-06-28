@@ -44,7 +44,7 @@ cur.execute("select exists(select * from information_schema.tables where table_n
 if cur.fetchone()[0]:
     cur.close()
 else:
-    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, id integer, lists varchar, );")
+    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, id integer, lists varchar);")
     
     
 APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
@@ -67,9 +67,7 @@ inline_news_keyboard= InlineKeyboardMarkup(
                                 ]
                                 )
 inlineNextKeyboard1 = InlineKeyboardMarkup([[InlineKeyboardButton("next", callback_data='1')]])
-
 inlineNextKeyboard2 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", callback_data='2'),InlineKeyboardButton("next", callback_data='1')]])
-
 inlineNextKeyboard3 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", callback_data='2')]])
 
 
@@ -111,47 +109,6 @@ userformat = {"listIDs":[],"lists":{}}
 
 newsListformat = {'code':None,'list':None,'index':None}
 
-class user:
-    def __init__(self,user_id):
-        self.user_id = user_id
-        self.currentCode = None
-        self.currentList = None
-        self.currentIndex = None
-        self.lists = {}
-        self.listIDs= []
-
-class newslist:
-    def __init__(self,uid,code):
-        self.uid = uid
-        self.code = code
-        self.currentList = None
-        self.currentIndex = None
-
-            
-
-
-
-
-# helper functions
-def find_user(users, user_id):
-    """
-    Returns the user object with given user_id
-
-    Args:
-         users:   The list of user instances to search through.
-         user_id: The ID of the user to find.
-
-    Returns:
-            The 'user' object with user_id.
-    """
-    for i in range(len(users)):
-        if users[i].user_id == user_id:
-            return users[i]
-
-    return None
-
-
-        
 
 def start(bot, update):
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
