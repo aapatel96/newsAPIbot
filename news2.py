@@ -44,7 +44,7 @@ cur.execute("select exists(select * from information_schema.tables where table_n
 if cur.fetchone()[0]:
     cur.close()
 else:
-    cur.execute("CREATE TABLE users (no. serial PRIMARY KEY, id integer, lists varchar);")
+    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, uid integer, lists varchar);")
     
     
 APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
