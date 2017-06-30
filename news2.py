@@ -226,11 +226,12 @@ def nextButton(bot,update):
         keyboard = inlineNextKeyboard2
     print newsList2use['index']
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
-    query = {'uid':userDB['uid']}
+    query = {'uid':userDB['uid'],"lists.listID":listID}
     print userDB["lists"][find_newsList(userDB['lists'],listID)]['index']
-    users.update(query, {'$set': {userDB["lists"][find_newsList(userDB['lists'],listID)]['index']:newsList2use['index']}})
 
-    bot.edit_message_text(text=x,
+    users.update(query, {'$inc': {"index":1}})
+
+    bot.edit_message_text(text=x,   
                       chat_id=queryObj.message.chat_id,
                       message_id=mid)
     bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
