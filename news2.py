@@ -158,7 +158,7 @@ def whatNews(bot,update):
             while listID in userDB["listIDs"]:
                 listID = str(randint(10000,99999))
                 
-            userfind["listIDs"].append(str(listID))
+##            userfind["listIDs"].append(str(listID))
             newsList = newsListformat
             
             url = newsapi+code+topnews
@@ -178,8 +178,8 @@ def whatNews(bot,update):
             userDB = users.find_one({"uid":update.message.from_user.id})
             
             newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)] #435
-            userfind["listIDs"].append(listID)
-            userfind["lists"].append(newsList)
+##            userfind["listIDs"].append(listID)
+##            userfind["lists"].append(newsList)
 
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             print userDB
