@@ -202,6 +202,9 @@ def nextButton(bot,update):
     mid = queryObj.message.message_id
     try:
         userDB = users.find_one({"uid":queryObj.message.chat.id})
+        print '\n'
+        print '\n'
+        print userDB
         print type(userDB)
     except:
         queryObj.message.reply_text("You are not registered. Press /start and then resend command")
@@ -213,7 +216,6 @@ def nextButton(bot,update):
 ##        return ConversationHandler.END
 
     newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
-    print "index: %s",(userDB['lists'][find_newsList(userDB['lists'],listID)]['index'],)
     
     if str(queryData) == "2":
         newsList2use['index'] = newsList2use['index'] -1
