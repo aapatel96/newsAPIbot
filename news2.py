@@ -229,7 +229,7 @@ def nextButton(bot,update):
     query = {'uid':userDB['uid'],"lists.listID":listID}
     print userDB["lists"][find_newsList(userDB['lists'],listID)]['index']
 
-    users.update(query, {'$inc': {"index":1}})
+    users.update(query, {'$set': {"index":newsList2use['index']}})
 
     bot.edit_message_text(text=x,   
                       chat_id=queryObj.message.chat_id,
