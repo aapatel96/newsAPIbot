@@ -227,6 +227,7 @@ def nextButton(bot,update):
     print newsList2use['index']
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
     query = {'uid':userDB['uid']}
+    print userDB["lists"][find_newsList(userDB['lists'],listID)]['index']
     users.update(query, {'$set': {"lists"[find_newsList(userDB['lists'],listID)]['index']:newsList2use['index']}})
 
     bot.edit_message_text(text=x,
