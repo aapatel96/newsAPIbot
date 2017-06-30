@@ -200,22 +200,15 @@ def nextButton(bot,update):
     textComps = text.split('\n')
     listID = textComps[0][5:]
     mid = queryObj.message.message_id
-    try:
-        userDB = users.find_one({"uid":queryObj.message.chat.id})
-        print '\n'
-        print '\n'
-        print userDB
-        print type(userDB)
-    except:
-        queryObj.message.reply_text("You are not registered. Press /start and then resend command")
-        return ConversationHandler.END
+    uid = queryObj.message.chat.id
+
 ##    try:
 ##        userfind = usersJ[queryObj.message.chat.id]
 ##    except:
 ##        update.message.reply_text("You are not registered. Press /start and then resend command")
 ##        return ConversationHandler.END
 
-    query = {'uid':userDB['uid'],"lists.listID":listID}
+    query = {'uid':uid,"lists.listID":listID}
 
     if str(queryData) == "2":
         print "hi1"
@@ -223,11 +216,9 @@ def nextButton(bot,update):
     if str(queryData) == "1":
         print "hi2"
         users.update(query, {'$inc': {"index":-1}})
-    newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
-
-    if newsList2use['index'] == 0:
+    if users.find_one({"uid":uid})['index'] == 0:
         keyboard = inlineNextKeyboard1
-    elif newsList2use['index'] == len(newsList2use['list'])-1:
+    elif users.find_one({"uid":uid})['index'] == len(newsList2use['list'])-1:
         keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
