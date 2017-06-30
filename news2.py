@@ -2,18 +2,18 @@ import json
 import os.path
 import os
 import sys
+
 from telegram.ext import Updater, CommandHandler, MessageHandler,ConversationHandler, Filters, Job, JobQueue, CallbackQueryHandler
 import telegram.replykeyboardmarkup
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.keyboardbutton
+from telegram.chataction import ChatAction
+
 import logging
 import urllib
-from telegram.chataction import ChatAction
 import time
-import psycopg2
 from random import randint
-import urlparse
-import cPickle as Pickle
+import pymongo
 
 try:
     import apiai
@@ -23,30 +23,6 @@ except ImportError:
     )
     import apiai
 
-
-urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ['DATABASE_URL'])
-
-try:
-
-    conn = psycopg2.connect(
-        database=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port
-    )
-except:
-    print "I could not connect to the database"
-
-cur = conn.cursor()
-cur.execute("select exists(select * from information_schema.tables where table_name=%s)", ('users',))
-if cur.fetchone()[0]:
-    cur.close()
-else:
-    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, uid integer, lists varchar);")
-    
-    
 APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
 
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
@@ -89,10 +65,14 @@ topnews = "&sortBy=top&apiKey=07ce18ffbbca413289f3d57290de93e9"
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
+client = pymongo.MongoClient('mongodb://heroku_08dm19tr:4mh6rof07dnjnc7n2eo70s0o9c@ds141242.mlab.com:41242/heroku_08dm19tr',connect=False)
+
+db = client.get_default_database()
 
 usersJ = {}
 
-   
+users = db['users']
+
 
 
 # Enable logging
@@ -104,9 +84,15 @@ logger = logging.getLogger(__name__)
 
 #classes
 
-userformat = {"listIDs":[],"lists":{}}
+userformat = {"uid":None,"listIDs":[],"lists":[]}
 
-newsListformat = {'code':None,'list':None,'index':None}
+newsListformat = {'listID':None,'code':None,'list':None,'index':None}
+
+def find_newsList(listf, listID):
+    for i in range(len(listf)):
+        if listf[i]['listID'] == listID:
+            return i
+    return None
 
 
 def start(bot, update):
@@ -115,10 +101,19 @@ def start(bot, update):
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     time.sleep(2)
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
+    time.sleep(2)
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
 
     userJ = userformat
+    userJ['uid'] = update.message.from_user.id
+##    try:
+##        print "hi1"
+##        userDB = users.find_one({"uid":update.message.from_user.id})
+##    except:
+##        print "hi2"
+    users.insert_one(userJ)
+        
     usersJ[update.message.from_user.id]=userJ
         
 def help(bot, update):
@@ -129,6 +124,12 @@ def help(bot, update):
 def whatNews(bot,update):
     try:
         userfind = usersJ[update.message.from_user.id]
+    except:
+        update.message.reply_text("You are not registered. Press /start and then resend command")
+        return ConversationHandler.END
+    try:
+        userDB = users.find_one({"uid":update.message.from_user.id})
+        print type(userDB)
     except:
         update.message.reply_text("You are not registered. Press /start and then resend command")
         return ConversationHandler.END
@@ -153,11 +154,11 @@ def whatNews(bot,update):
         else:
             code = JSON['result']['parameters']['Newsource']
             logging.info(code)
-            listID = randint(10000,99999)
+            listID = str(randint(10000,99999))
             while listID in userfind["listIDs"]:
-                listID = randint(10000,99999)
+                listID = str(randint(10000,99999))
                 
-            userfind["listIDs"].append(listID)
+            userfind["listIDs"].append(str(listID))
             newsList = newsListformat
             
             url = newsapi+code+topnews
@@ -166,20 +167,24 @@ def whatNews(bot,update):
             logging.info(str(data))
             x = ''
             
-
-            
             newsList['code']=code
             newsList['list']=data['articles']
             newsList['index']=0
+            newsList['listID']=listID
+                        
+            users.update({"uid":update.message.from_user.id},  {'$push': {'lists': newsList}})
+            users.update({"uid":update.message.from_user.id}, {'$push': {'listIDs': listID}})
 
-
+            userDB = users.find_one({"uid":update.message.from_user.id})
+            
+            newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
             userfind["listIDs"].append(listID)
-            userfind["lists"][listID]=newsList
+            userfind["lists"].append(newsList)
 
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-            
-            x = "QUERY"+str(listID)+'\n'+'\n'+userfind["lists"][listID]['list'][userfind["lists"][listID]['index']]['url']
-            
+            print userDB
+            x = "QUERY"+str(listID) +'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
+
 ##          for i in data.values()[3]:
 ##              listx = i.values()
 ##              x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
@@ -193,29 +198,36 @@ def nextButton(bot,update):
     queryData = update.callback_query.data
     text =  message=update.callback_query.message.text
     textComps = text.split('\n')
-    listID = int(textComps[0][5:])
-
+    listID = textComps[0][5:]
     mid = queryObj.message.message_id
+    try:
+        userDB = users.find_one({"uid":queryObj.message.chat.id})
+        print type(userDB)
+    except:
+        update.message.reply_text("You are not registered. Press /start and then resend command")
+        return ConversationHandler.END
     try:
         userfind = usersJ[queryObj.message.chat.id]
     except:
         update.message.reply_text("You are not registered. Press /start and then resend command")
         return ConversationHandler.END
-    if userfind == None:
-        queryObj.message.reply_text("Please type /start and then resend command")
-        return ConversationHandler.END
-    if str(queryData) == "2":
-        userfind['lists'][listID]['index'] = userfind['lists'][listID]['index'] -1
-    if str(queryData) == "1":
-        userfind['lists'][listID]['index'] = userfind['lists'][listID]['index'] +1
+
+    newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
     
-    if userfind['lists'][listID]['index'] == 0:
+    if str(queryData) == "2":
+        newsList2use['index'] = newsList2use['index'] -1
+    if str(queryData) == "1":
+        newsList2use['index'] = newsList2use['index'] +1
+    if newsList2use['index'] == 0:
         keyboard = inlineNextKeyboard1
-    elif userfind['lists'][listID]['index'] == len(userfind['lists'][listID]['list'])-1:
+    elif newsList2use['index'] == len(newsList2use['list'])-1:
         keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
-    x = "QUERY"+str(listID)+'\n'+'\n'+userfind["lists"][listID]['list'][userfind["lists"][listID]['index']]['url']
+    print newsList2use1['index']
+    x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
+    query = {'uid':userDB['uid']}
+    users.update(query, {'$set': {"lists"[find_newsList(userDB['lists'],listID)]['index']:newsList2use['index']}})
 
     bot.edit_message_text(text=x,
                       chat_id=queryObj.message.chat_id,
