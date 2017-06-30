@@ -204,13 +204,13 @@ def nextButton(bot,update):
         userDB = users.find_one({"uid":queryObj.message.chat.id})
         print type(userDB)
     except:
-        update.message.reply_text("You are not registered. Press /start and then resend command")
+        queryObj.message.reply_text("You are not registered. Press /start and then resend command")
         return ConversationHandler.END
-    try:
-        userfind = usersJ[queryObj.message.chat.id]
-    except:
-        update.message.reply_text("You are not registered. Press /start and then resend command")
-        return ConversationHandler.END
+##    try:
+##        userfind = usersJ[queryObj.message.chat.id]
+##    except:
+##        update.message.reply_text("You are not registered. Press /start and then resend command")
+##        return ConversationHandler.END
 
     newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
     
