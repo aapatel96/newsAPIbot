@@ -217,10 +217,13 @@ def nextButton(bot,update):
 
     newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
     if str(queryData) == "2":
-        print 
+        print "hi1"
         newsList2use['index'] = newsList2use['index'] -1
+        print newsList2use['index']
     if str(queryData) == "1":
+        print "hi2"
         newsList2use['index'] = newsList2use['index'] +1
+        print newsList2use['index']
     if newsList2use['index'] == 0:
         keyboard = inlineNextKeyboard1
     elif newsList2use['index'] == len(newsList2use['list'])-1:
