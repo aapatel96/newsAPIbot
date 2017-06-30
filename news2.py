@@ -222,7 +222,7 @@ def nextButton(bot,update):
 ##        keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
-    print newsList2use['index']
+##    print newsList2use['index']
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
     print userDB["lists"][find_newsList(userDB['lists'],listID)]['index']
 
