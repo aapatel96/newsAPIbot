@@ -224,7 +224,7 @@ def nextButton(bot,update):
         keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
-    print newsList2use1['index']
+    print newsList2use['index']
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
     query = {'uid':userDB['uid']}
     users.update(query, {'$set': {"lists"[find_newsList(userDB['lists'],listID)]['index']:newsList2use['index']}})
