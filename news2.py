@@ -134,9 +134,9 @@ def whatNews(bot,update):
         update.message.reply_text("You are not registered. Press /start and then resend command2")
         return ConversationHandler.END
     
-    if userfind == None:
-        update.message.reply_text("Please type /start and then resend command")
-        return ConversationHandler.END
+##    if userfind == None:
+##        update.message.reply_text("Please type /start and then resend command")
+##        return ConversationHandler.END
     
     if update.message.text == "What do you think about the government?":
         update.message.reply_text("yeh government bik gayi hai")
