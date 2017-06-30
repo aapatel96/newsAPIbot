@@ -125,13 +125,13 @@ def whatNews(bot,update):
     try:
         userfind = usersJ[update.message.from_user.id]
     except:
-        update.message.reply_text("You are not registered. Press /start and then resend command")
+        update.message.reply_text("You are not registered. Press /start and then resend command1")
         return ConversationHandler.END
     try:
         userDB = users.find_one({"uid":update.message.from_user.id})
         print type(userDB)
     except:
-        update.message.reply_text("You are not registered. Press /start and then resend command")
+        update.message.reply_text("You are not registered. Press /start and then resend command2")
         return ConversationHandler.END
     
     if userfind == None:
