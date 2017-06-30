@@ -177,7 +177,7 @@ def whatNews(bot,update):
 
             userDB = users.find_one({"uid":update.message.from_user.id})
             
-            newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
+            newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)] #435
             userfind["listIDs"].append(listID)
             userfind["lists"].append(newsList)
 
