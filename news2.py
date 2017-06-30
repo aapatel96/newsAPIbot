@@ -213,6 +213,7 @@ def nextButton(bot,update):
 ##        return ConversationHandler.END
 
     newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
+    print "index: %s",(userDB['lists'][find_newsList(userDB['lists'],listID)]['index'],)
     
     if str(queryData) == "2":
         newsList2use['index'] = newsList2use['index'] -1
