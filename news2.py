@@ -122,11 +122,11 @@ def help(bot, update):
                               +'fintask ,<taskid> to delete task by task id (you can find this out using /mytasks command'+ '\n' +'delthabit <habitid> to delete habit by habit id (you can find this out using /myhabits command)' +"/help to get command list")
 
 def whatNews(bot,update):
-    try:
-        userfind = usersJ[update.message.from_user.id]
-    except:
-        update.message.reply_text("You are not registered. Press /start and then resend command1")
-        return ConversationHandler.END
+##    try:
+##        userfind = usersJ[update.message.from_user.id]
+##    except:
+##        update.message.reply_text("You are not registered. Press /start and then resend command1")
+##        return ConversationHandler.END
     try:
         userDB = users.find_one({"uid":update.message.from_user.id})
         print type(userDB)
