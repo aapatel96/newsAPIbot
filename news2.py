@@ -218,8 +218,8 @@ def nextButton(bot,update):
         users.update(query, {'$inc': {"index":-1}})
     if users.find_one({"uid":uid})['index'] == 0:
         keyboard = inlineNextKeyboard1
-    elif users.find_one({"uid":uid})['index'] == len(newsList2use['list'])-1:
-        keyboard = inlineNextKeyboard3
+##    elif users.find_one({"uid":uid}) == len(newsList2use['list'])-1:
+##        keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
     print newsList2use['index']
