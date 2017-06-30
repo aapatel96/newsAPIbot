@@ -65,7 +65,7 @@ topnews = "&sortBy=top&apiKey=07ce18ffbbca413289f3d57290de93e9"
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-client = pymongo.MongoClient('mongodb://heroku_08dm19tr:4mh6rof07dnjnc7n2eo70s0o9c@ds141242.mlab.com:41242/heroku_08dm19tr',connect=False)
+client = pymongo.MongoClient('mongodb://heroku_08dm19tr:4mh6rof07dnjnc7n2eo70s0o9c@ds141242.mlab.com:41242/heroku_08dm19tr')
 
 db = client.get_default_database()
 
@@ -215,15 +215,16 @@ def nextButton(bot,update):
 ##        update.message.reply_text("You are not registered. Press /start and then resend command")
 ##        return ConversationHandler.END
 
-    newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
+    query = {'uid':userDB['uid'],"lists.listID":listID}
+
     if str(queryData) == "2":
         print "hi1"
-        newsList2use['index'] = newsList2use['index'] -1
-        print newsList2use['index']
+        users.update(query, {'$inc': {"index":1}})
     if str(queryData) == "1":
         print "hi2"
-        newsList2use['index'] = newsList2use['index'] +1
-        print newsList2use['index']
+        users.update(query, {'$inc': {"index":-1}})
+    newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)]
+
     if newsList2use['index'] == 0:
         keyboard = inlineNextKeyboard1
     elif newsList2use['index'] == len(newsList2use['list'])-1:
@@ -232,7 +233,6 @@ def nextButton(bot,update):
         keyboard = inlineNextKeyboard2
     print newsList2use['index']
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
-    query = {'uid':userDB['uid'],"lists.listID":listID}
     print userDB["lists"][find_newsList(userDB['lists'],listID)]['index']
 
     users.update(query, {'$set': {"index":newsList2use['index']}})
