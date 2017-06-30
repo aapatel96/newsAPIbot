@@ -155,7 +155,7 @@ def whatNews(bot,update):
             code = JSON['result']['parameters']['Newsource']
             logging.info(code)
             listID = str(randint(10000,99999))
-            while listID in userfind["listIDs"]:
+            while listID in userDB["listIDs"]:
                 listID = str(randint(10000,99999))
                 
             userfind["listIDs"].append(str(listID))
