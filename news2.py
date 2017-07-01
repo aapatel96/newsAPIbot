@@ -14,6 +14,7 @@ import urllib
 import time
 from random import randint
 import pymongo
+import requests
 
 try:
     import apiai
@@ -126,6 +127,7 @@ def help(bot, update):
 
 def herokualarm(bot,job):
     logger.info("ping")
+    requests.post("https://delayedecho.herokuapp.com/", data={"ping":"ping"})
     job = job.context.run_once(herokualarm, 15*60,context=job.context)
     
 def whatNews(bot,update):
