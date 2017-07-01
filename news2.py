@@ -212,15 +212,11 @@ def nextButton(bot,update):
     newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
     if newsList['index'] == 0:
         bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard1,parse_mode='HTML')
-
     elif newsList['index'] == len(newsList['list'])-1:
         bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard3,parse_mode='HTML')
-
     else:
-        if newsList['index']==1 or newsList['index']==1:
-            bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard2,parse_mode='HTML')
+        bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard2,parse_mode='HTML')
 
-        keyboard = inlineNextKeyboard2
         
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList['list'][newsList['index']]['url']
 
