@@ -96,7 +96,16 @@ def find_newsList(listf, listID):
     return None
 
 
-def start(bot, update):
+def start(bot, update, job_queue):
+    userDB = users.find_one({"uid":update.message.from_user.id})
+    
+    if userDB != None:
+        update.message.reply_text("you are already registered")
+        return
+        
+    userJ = userformat
+    userJ['uid'] = update.message.from_user.id
+    users.insert_one(userJ)
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Welcome to News bot")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
@@ -105,23 +114,20 @@ def start(bot, update):
     time.sleep(2)
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
-
-    userJ = userformat
-    userJ['uid'] = update.message.from_user.id
-##    try:
-##        print "hi1"
-##        userDB = users.find_one({"uid":update.message.from_user.id})
-##    except:
-##        print "hi2"
-    users.insert_one(userJ)
+    
         
     usersJ[update.message.from_user.id]=userJ
+    job = job_queue.run_once(herokualarm, 1,context=job_queue)
         
 def help(bot, update):
     update.message.reply_text(' newtask <taskname:priority:duedate> to create a task'+ '\n'
                               + ' mytasks to show tasks'+'\n'+ ' newhabit <habitname:priority>'+'\n'+ ' myhabits to show tasks'+'\n'+ ' deltask <taskid> to delete task by task id (you can find this out using /mytasks command)'
                               +'fintask ,<taskid> to delete task by task id (you can find this out using /mytasks command'+ '\n' +'delthabit <habitid> to delete habit by habit id (you can find this out using /myhabits command)' +"/help to get command list")
 
+def herokualarm(bot,job):
+    logger.info("ping")
+    job = job.context.run_once(herokualarm, 15*60,context=job.context)
+    
 def whatNews(bot,update):
 ##    try:
 ##        userfind = usersJ[update.message.from_user.id]
@@ -153,7 +159,6 @@ def whatNews(bot,update):
             return
         else:
             code = JSON['result']['parameters']['Newsource']
-            logging.info(code)
             listID = str(randint(10000,99999))
             while listID in userDB["listIDs"]:
                 listID = str(randint(10000,99999))
@@ -164,7 +169,6 @@ def whatNews(bot,update):
             url = newsapi+code+topnews
             response = urllib.urlopen(url)
             data = json.loads(response.read())
-            logging.info(str(data))
             x = ''
             
             newsList['code']=code
@@ -254,7 +258,7 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("start",start,pass_job_queue=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(Filters.text, whatNews))
     dp.add_handler(CallbackQueryHandler(nextButton))
