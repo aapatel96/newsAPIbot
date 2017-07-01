@@ -66,7 +66,7 @@ topnews = "&sortBy=top&apiKey=07ce18ffbbca413289f3d57290de93e9"
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-client = pymongo.MongoClient('mongodb://heroku_08dm19tr:4mh6rof07dnjnc7n2eo70s0o9c@ds141242.mlab.com:41242/heroku_08dm19tr')
+client = pymongo.MongoClient('mongodb://heroku_f2r337th:ne3c4ehdbnknfrd5k815kth4qa@ds143362.mlab.com:43362/heroku_f2r337th',connect=False)
 
 db = client.get_default_database()
 
@@ -106,7 +106,7 @@ def start(bot, update, job_queue):
         
     userJ = userformat
     userJ['uid'] = update.message.from_user.id
-    users.insert_one(userJ)
+    users.insert_one({"uid":update.message.from_user.id,"listIDs":[],"lists":[]})
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Welcome to News bot")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
@@ -117,7 +117,6 @@ def start(bot, update, job_queue):
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
     
         
-    usersJ[update.message.from_user.id]=userJ
     job = job_queue.run_once(herokualarm, 1,context=job_queue)
         
 def help(bot, update):
@@ -172,10 +171,12 @@ def whatNews(bot,update):
             newsList['listID']=listID
             newsList['uid'] = update.message.from_user.id
 
-            x = newsLists.insert_one(newsList)
+            x = newsLists.insert({"code":code,"list":data['articles'],"index":0,"listID":listID,"uid":update.message.from_user.id})
             
 
             users.update({"uid":update.message.from_user.id}, {'$push':{'listIDs': listID}})
+            users.update({"uid":update.message.from_user.id}, {'$push':{'listIDs': listID}})
+
 
             newsList2use = newsLists.find_one({"listID":listID})
 
@@ -248,12 +249,12 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+##    updater.start_webhook(listen="0.0.0.0",
+##                      port=PORT,
+##                      url_path=TOKEN)
+##    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-##    updater.start_polling()
+    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
