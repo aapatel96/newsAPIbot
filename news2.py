@@ -70,7 +70,7 @@ client = pymongo.MongoClient('mongodb://heroku_08dm19tr:4mh6rof07dnjnc7n2eo70s0o
 
 db = client.get_default_database()
 
-usersJ = {}
+
 
 users = db['users']
 newsLists = db['newslists']
@@ -131,20 +131,14 @@ def herokualarm(bot,job):
     job = job.context.run_once(herokualarm, 15*60,context=job.context)
     
 def whatNews(bot,update):
-##    try:
-##        userfind = usersJ[update.message.from_user.id]
-##    except:
-##        update.message.reply_text("You are not registered. Press /start and then resend command1")
-##        return ConversationHandler.END
+
     try:
         userDB = users.find_one({"uid":update.message.from_user.id})
     except:
         update.message.reply_text("You are not registered. Press /start and then resend command2")
         return ConversationHandler.END
     
-##    if userfind == None:
-##        update.message.reply_text("Please type /start and then resend command")
-##        return ConversationHandler.END
+
     
     if update.message.text == "What do you think about the government?":
         update.message.reply_text("yeh government bik gayi hai")
@@ -165,7 +159,6 @@ def whatNews(bot,update):
             while listID in userDB["listIDs"]:
                 listID = str(randint(10000,99999))
                 
-##            userfind["listIDs"].append(str(listID))
             newsList = newsListformat
             
             url = newsapi+code+topnews
@@ -182,21 +175,11 @@ def whatNews(bot,update):
             x = newsLists.insert_one(newsList)
             
 
-##            users.update({"uid":update.message.from_user.id},  {'$push': {'lists': oid}})
             users.update({"uid":update.message.from_user.id}, {'$push':{'listIDs': listID}})
 
-##            userDB = users.find_one({"uid":update.message.from_user.id})
-##            newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)] #435
             newsList2use = newsLists.find_one({"listID":listID})
-##            userfind["listIDs"].append(listID)
-##            userfind["lists"].append(newsList)
 
-##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
             x = "QUERY"+str(listID) +'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
-
-##          for i in data.values()[3]:
-##              listx = i.values()
-##              x = x+listx[1]+"\n"+listx[2]+"\n"+"\n"
 
             update.message.reply_text(x,reply_markup=inlineNextKeyboard1,parse_mode='HTML')
     return
@@ -211,11 +194,7 @@ def nextButton(bot,update):
     mid = queryObj.message.message_id
     uid = queryObj.message.chat.id
 
-##    try:
-##        userfind = usersJ[queryObj.message.chat.id]
-##    except:
-##        update.message.reply_text("You are not registered. Press /start and then resend command")
-##        return ConversationHandler.END
+
     query = {"uid":queryObj.message.chat.id,"listID":listID}
     newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
 
@@ -232,11 +211,15 @@ def nextButton(bot,update):
 
     newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
     if newsList['index'] == 0:
-        keyboard = inlineNextKeyboard1
+        bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard1,parse_mode='HTML')
 
     elif newsList['index'] == len(newsList['list'])-1:
-        keyboard = inlineNextKeyboard3
+        bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard3,parse_mode='HTML')
+
     else:
+        if newsList['index']==1 or newsList['index']==1:
+            bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =inlineNextKeyboard2,parse_mode='HTML')
+
         keyboard = inlineNextKeyboard2
         
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList['list'][newsList['index']]['url']
@@ -245,7 +228,6 @@ def nextButton(bot,update):
     bot.edit_message_text(text=x,   
                       chat_id=queryObj.message.chat_id,
                       message_id=mid)
-    bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
     return
 
     
@@ -254,7 +236,6 @@ def main():
     TOKEN = "395034398:AAHfgv6aYDbhT2odEo5PvFWJH3EhhK6uC9s"
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(TOKEN)
-    # job_q= updater.job_queue
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
