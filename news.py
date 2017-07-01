@@ -38,6 +38,14 @@ try:
     )
 except:
     print "I could not connect to the database"
+
+cur = conn.cursor()
+cur.execute("select exists(select * from information_schema.tables where table_name=%s)", ('users',))
+if cur.fetchone()[0]:
+    cur.close()
+else:
+    cur.execute("CREATE TABLE users (id serial PRIMARY KEY, id integer, lists varchar, );")
+    
     
 APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
 
@@ -85,6 +93,7 @@ def error(bot, update, error):
 
 
 users = []
+usersJ = {}
 
 ##chatidFile = open("chatids.txt","r")
 ##lines = chatidFile.readlines()
@@ -104,6 +113,10 @@ logger = logging.getLogger(__name__)
 
 
 #classes
+
+userformat = {"listIDs":[],"lists":[]}
+
+newsListformat = {'code':None,'list':None,'index':None}
 
 class user:
     def __init__(self,user_id):
@@ -155,12 +168,10 @@ def start(bot, update):
     update.message.reply_text("Credit to https://newsapi.org/ for the news sources")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
-    chatidFile = open("chatids.txt","a")
-    chatidFile.write(str(update.message.from_user.id)+'\n')
-    cur = conn.cursor()
-    try:
-        message = "INSERT INTO users (id) VALUES " +str(update.message.from_user.id)
-        cur.execute(message)
+
+    userJ = userformat
+    usersJ[update.message.from_user.id]=userJ
+    
     users.append(user(update.message.from_user.id))   
     
 def help(bot, update):
@@ -309,10 +320,16 @@ def hn(bot,update):
 def whatNews(bot,update):
 
     userfind = find_user(users,update.message.from_user.id)
+    try:
+        userfindJ = usersJ[update.message.from_user.id]
+    except:
+        update.message.reply_text("You are not registered. Press /start and then resend command")
+        return ConversationHandler.END
     
     if userfind == None:
         update.message.reply_text("Please type /start and then resend command")
         return ConversationHandler.END
+    
     if update.message.text == "What do you think about the government?":
         update.message.reply_text("yeh government bik gayi hai")
         return ConversationHandler.END
@@ -335,8 +352,13 @@ def whatNews(bot,update):
                 listID = randint(10000,99999)
                 
             userfind.listIDs.append(listID)
-            
+            userfindJ["listIDs"].append(listID)
+
             newsList = newslist(listID,code)
+            newsListJ = newsListformat
+
+            
+
             
             userfind.currentCode = code
             url = newsapi+code+topnews
@@ -346,9 +368,15 @@ def whatNews(bot,update):
             x = ''
             
             userfind.currentList = data['articles']
-            newsList.currentList = data['articles']
+            newsList.currentList = data['articles']            
             userfind.currentIndex = 0
             newsList.currentIndex = 0
+            
+            newsListJ['code']=code
+            newsListJ['list']=data['articles']
+
+            userfindJ["listIDs"].append(listID)
+            userfindJ["lists"][listID]=newsListJ
 
             userfind.lists[listID] = newsList
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
@@ -375,6 +403,7 @@ def nextButton(bot,update):
 
     mid = queryObj.message.message_id
     userfind = find_user(users,queryObj.message.chat.id)
+    userfindJ
     if userfind == None:
         queryObj.message.reply_text("Please type /start and then resend command")
         return ConversationHandler.END

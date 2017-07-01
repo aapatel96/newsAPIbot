@@ -72,6 +72,7 @@ db = client.get_default_database()
 usersJ = {}
 
 users = db['users']
+newsLists = db['newslists']
 
 
 
@@ -86,7 +87,7 @@ logger = logging.getLogger(__name__)
 
 userformat = {"uid":None,"listIDs":[],"lists":[]}
 
-newsListformat = {'listID':None,'code':None,'list':None,'index':None}
+newsListformat = {'uid':None,'listID':None,'code':None,'list':None,'index':None}
 
 def find_newsList(listf, listID):
     for i in range(len(listf)):
@@ -129,7 +130,6 @@ def whatNews(bot,update):
 ##        return ConversationHandler.END
     try:
         userDB = users.find_one({"uid":update.message.from_user.id})
-        print type(userDB)
     except:
         update.message.reply_text("You are not registered. Press /start and then resend command2")
         return ConversationHandler.END
@@ -171,18 +171,21 @@ def whatNews(bot,update):
             newsList['list']=data['articles']
             newsList['index']=0
             newsList['listID']=listID
-                        
-            users.update({"uid":update.message.from_user.id},  {'$push': {'lists': newsList}})
-            users.update({"uid":update.message.from_user.id}, {'$push': {'listIDs': listID}})
+            newsList['uid'] = update.message.from_user.id
 
-            userDB = users.find_one({"uid":update.message.from_user.id})
+            x = newsLists.insert_one(newsList)
             
-            newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)] #435
+
+##            users.update({"uid":update.message.from_user.id},  {'$push': {'lists': oid}})
+            users.update({"uid":update.message.from_user.id}, {'$push':{'listIDs': listID}})
+
+##            userDB = users.find_one({"uid":update.message.from_user.id})
+##            newsList2use = userDB['lists'][find_newsList(userDB['lists'],listID)] #435
+            newsList2use = newsLists.find_one({"listID":listID})
 ##            userfind["listIDs"].append(listID)
 ##            userfind["lists"].append(newsList)
 
 ##            x = "<b>"+userfind.currentList[userfind.currentIndex].values()[1].upper()+"</b>"+"\n\n"+userfind.currentList[userfind.currentIndex].values()[0]+"\n\n"+userfind.currentList[userfind.currentIndex].values()[2]
-            print userDB
             x = "QUERY"+str(listID) +'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
 
 ##          for i in data.values()[3]:
@@ -207,26 +210,31 @@ def nextButton(bot,update):
 ##    except:
 ##        update.message.reply_text("You are not registered. Press /start and then resend command")
 ##        return ConversationHandler.END
+    query = {"uid":queryObj.message.chat.id,"listID":listID}
+    newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
 
-    query = {'uid':uid,"lists.listID":listID}
+
+    newsListIndex = newsList['index']
+    
 
     if str(queryData) == "2":
-        print "hi1"
-        users.update(query, {'$inc': {"index":1}})
+
+        newsLists.update(query, {'$inc': {"index":-1}})
     if str(queryData) == "1":
-        print "hi2"
-        users.update(query, {'$inc': {"index":-1}})
-    if users.find_one({"uid":uid})['index'] == 0:
+
+        newsLists.update(query, {'$inc': {"index":1}})
+
+    newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
+    if newsList['index'] == 0:
         keyboard = inlineNextKeyboard1
-##    elif users.find_one({"uid":uid}) == len(newsList2use['list'])-1:
-##        keyboard = inlineNextKeyboard3
+
+    elif newsList['index'] == len(newsList['list'])-1:
+        keyboard = inlineNextKeyboard3
     else:
         keyboard = inlineNextKeyboard2
-##    print newsList2use['index']
-    x = "QUERY"+str(listID)+'\n'+'\n'+newsList2use['list'][newsList2use['index']]['url']
-    print userDB["lists"][find_newsList(userDB['lists'],listID)]['index']
+        
+    x = "QUERY"+str(listID)+'\n'+'\n'+newsList['list'][newsList['index']]['url']
 
-    users.update(query, {'$set': {"index":newsList2use['index']}})
 
     bot.edit_message_text(text=x,   
                       chat_id=queryObj.message.chat_id,
