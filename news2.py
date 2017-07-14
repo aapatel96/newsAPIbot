@@ -238,6 +238,9 @@ def main():
     TOKEN = "395034398:AAHfgv6aYDbhT2odEo5PvFWJH3EhhK6uC9s"
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(TOKEN)
+    userslist = list(users.find())
+    for user in userslist:
+        updater.bot.send_message(user['uid'],"Business Insider and Economist added as sources",reply_markup=news_keyboard)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
