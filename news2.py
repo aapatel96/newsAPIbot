@@ -33,7 +33,10 @@ news_keyboard= telegram.replykeyboardmarkup.ReplyKeyboardMarkup([[telegram.Keybo
                                                               [telegram.KeyboardButton("recode")],[telegram.KeyboardButton("techcrunch")],
                                                               [telegram.KeyboardButton("the guardian")],[telegram.KeyboardButton("the verge")],
                                                               [telegram.KeyboardButton("new york times")],[telegram.KeyboardButton("wapo")],
-                                                              [telegram.KeyboardButton("reuters")],[telegram.KeyboardButton("ap")],[telegram.KeyboardButton("bloomberg")]], resize_keyboard=True)
+                                                              [telegram.KeyboardButton("reuters")],[telegram.KeyboardButton("ap")],
+                                                              [telegram.KeyboardButton("bloomberg")],
+                                                              [telegram.KeyboardButton("business insider")],
+                                                              [telegram.KeyboardButton("economist")]], resize_keyboard=True)
 inline_news_keyboard= InlineKeyboardMarkup(
                                 [
                                     [InlineKeyboardButton("google news"),InlineKeyboardButton("the hindu")],
