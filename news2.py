@@ -117,7 +117,7 @@ def start(bot, update, job_queue):
     time.sleep(2)
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
-    job_queue.run_once(herokualarm,,1,context=job_queue)
+    job_queue.run_once(herokualarm,1,context=job_queue)
         
         
 def help(bot, update):
