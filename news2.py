@@ -107,9 +107,8 @@ def start(bot, update, job_queue):
         update.message.reply_text("you are already registered")
         return
         
-    userJ = userformat
-    userJ['uid'] = update.message.from_user.id
-    users.insert_one({"uid":update.message.from_user.id,"listIDs":[],"lists":[]})
+    userJ = {"uid":update.message.from_user.id,"listIDs":[],"lists":[]}
+    users.insert_one(userJ)
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Welcome to News bot")
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
@@ -118,9 +117,8 @@ def start(bot, update, job_queue):
     time.sleep(2)
     bot.sendChatAction(update.message.chat.id, ChatAction.TYPING)
     update.message.reply_text("Choose from below to see the news that you want:", reply_markup=news_keyboard)
-    
+    job_queue.run_once(herokualarm,,1,context=job_queue)
         
-    job = job_queue.run_once(herokualarm, 1,context=job_queue)
         
 def help(bot, update):
     update.message.reply_text(' newtask <taskname:priority:duedate> to create a task'+ '\n'
@@ -238,10 +236,11 @@ def main():
     TOKEN = "395034398:AAHfgv6aYDbhT2odEo5PvFWJH3EhhK6uC9s"
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(TOKEN)
+    '''
     userslist = list(users.find())
     for user in userslist:
         updater.bot.send_message(user['uid'],"Business Insider and Economist added as sources",reply_markup=news_keyboard)
-
+    '''
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
