@@ -24,7 +24,7 @@ except ImportError:
     )
     import apiai
 
-APIAI_CLIENT_ACCESS_TOKEN = 'f60e16e080d7446285e92826bf51415e'
+APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
@@ -69,7 +69,7 @@ topnews = "&sortBy=top&apiKey=07ce18ffbbca413289f3d57290de93e9"
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-client = pymongo.MongoClient('mongodb://heroku_f2r337th:ne3c4ehdbnknfrd5k815kth4qa@ds143362.mlab.com:43362/heroku_f2r337th',connect=False)
+client = pymongo.MongoClient(os.environ['MONGODB_URI'])
 
 db = client.get_default_database()
 
@@ -233,7 +233,7 @@ def nextButton(bot,update):
     
 def main():
     PORT = int(os.environ.get('PORT', '5000'))
-    TOKEN = "395034398:AAHfgv6aYDbhT2odEo5PvFWJH3EhhK6uC9s"
+    TOKEN = os.environ['BOT_TOKEN']
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(TOKEN)
     '''
