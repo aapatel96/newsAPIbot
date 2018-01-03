@@ -9,7 +9,6 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.keyboardbutton
 from telegram.chataction import ChatAction
 
-import logging
 import urllib
 import time
 from random import randint
@@ -73,10 +72,7 @@ newsLists = db['newslists']
 
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
 
-logger = logging.getLogger(__name__)
 
 
 #classes
