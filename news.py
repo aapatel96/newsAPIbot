@@ -27,7 +27,7 @@ APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
-newsapi = "https://newsapi.org/v2/articles?source="
+newsapi = "https://newsapi.org/v2/top-headlines?source="
 news_keyboard= telegram.replykeyboardmarkup.ReplyKeyboardMarkup([[telegram.KeyboardButton("google news")],[telegram.KeyboardButton("the hindu")],
                                                               [telegram.KeyboardButton("techcrunch")],
                                                               [telegram.KeyboardButton("the guardian")],[telegram.KeyboardButton("the verge")],
@@ -54,7 +54,7 @@ reutersc="reuters"
 apc="associated-press"
 economistc ="the-economist"
 hnc ="hacker-news"
-topnews = "&sortBy=top&apiKey=07ce18ffbbca413289f3d57290de93e9"
+topnews = "&apiKey=07ce18ffbbca413289f3d57290de93e9"
 
 
 def error(bot, update, error):
