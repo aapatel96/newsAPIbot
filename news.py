@@ -9,7 +9,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.keyboardbutton
 from telegram.chataction import ChatAction
 
-import urllib
+import urllib.request
 import time
 from random import randint
 import pymongo
@@ -120,6 +120,7 @@ def herokualarm(bot,job):
     job = job.context.run_once(herokualarm, 15*60,context=job.context)
     
 def whatNews(bot,update):
+    print("yellow")
 
     try:
         userDB = users.find_one({"uid":update.message.from_user.id})
@@ -139,11 +140,14 @@ def whatNews(bot,update):
         request.query = update.message.text
         response = request.getresponse()
         JSON= json.loads(response.read().decode())
+        print(JSON)
         if JSON['result']['metadata']['intentName'] != 'smaug.news':
             update.message.reply_text("hmmm...did not get that...choose from below please",reply_markup=news_keyboard)
             return
         else:
             code = JSON['result']['parameters']['Newsource']
+            print('\n')
+            print(code)
             listID = str(randint(10000,99999))
             while listID in userDB["listIDs"]:
                 listID = str(randint(10000,99999))
@@ -151,15 +155,19 @@ def whatNews(bot,update):
             newsList = newsListformat
             
             url = newsapi+code+topnews
-            response = urllib.urlopen(url)
+            print(url)  
+            response = urllib.request.urlopen(url)
             data = json.loads(response.read())
-            x = ''
+            
             
             newsList['code']=code
             newsList['list']=data['articles']
             newsList['index']=0
             newsList['listID']=listID
             newsList['uid'] = update.message.from_user.id
+            print('\n')
+            print('\n')
+            print(newsList)
 
             x = newsLists.insert({"code":code,"list":data['articles'],"index":0,"listID":listID,"uid":update.message.from_user.id})
             
@@ -221,7 +229,8 @@ def nextButton(bot,update):
 
     
 def main():
-    PORT = int(os.environ.get('PORT', '5000'))
+    print("hi")
+    ##PORT = int(os.environ.get('PORT', '5000'))
     TOKEN = os.environ['BOT_TOKEN']
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(TOKEN)
