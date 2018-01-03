@@ -28,24 +28,16 @@ APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
-newsapi = "https://newsapi.org/v1/articles?source="
+newsapi = "https://newsapi.org/v2/articles?source="
 news_keyboard= telegram.replykeyboardmarkup.ReplyKeyboardMarkup([[telegram.KeyboardButton("google news")],[telegram.KeyboardButton("the hindu")],
-                                                              [telegram.KeyboardButton("recode")],[telegram.KeyboardButton("techcrunch")],
+                                                              [telegram.KeyboardButton("techcrunch")],
                                                               [telegram.KeyboardButton("the guardian")],[telegram.KeyboardButton("the verge")],
                                                               [telegram.KeyboardButton("new york times")],[telegram.KeyboardButton("wapo")],
                                                               [telegram.KeyboardButton("reuters")],[telegram.KeyboardButton("ap")],
                                                               [telegram.KeyboardButton("bloomberg")],
                                                               [telegram.KeyboardButton("business insider")],
                                                               [telegram.KeyboardButton("economist")]], resize_keyboard=True)
-inline_news_keyboard= InlineKeyboardMarkup(
-                                [
-                                    [InlineKeyboardButton("google news"),InlineKeyboardButton("the hindu")],
-                                    [InlineKeyboardButton("recode"),InlineKeyboardButton("techcrunch")],
-                                    [InlineKeyboardButton("the guardian"),InlineKeyboardButton("the verge")],
-                                    [InlineKeyboardButton("new york times"),InlineKeyboardButton("wapo")],
-                                    [InlineKeyboardButton("reuters"),InlineKeyboardButton("ap")],
-                                ]
-                                )
+
 inlineNextKeyboard1 = InlineKeyboardMarkup([[InlineKeyboardButton("next", callback_data='1')]])
 inlineNextKeyboard2 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", callback_data='2'),InlineKeyboardButton("next", callback_data='1')]])
 inlineNextKeyboard3 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", callback_data='2')]])
@@ -245,6 +237,7 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
+    dp.add_handler(CommandHandler("start",start,pass_job_queue=True))
     dp.add_handler(CommandHandler("start",start,pass_job_queue=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(Filters.text, whatNews))
