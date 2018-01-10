@@ -29,10 +29,10 @@ ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
 newsapi = "https://newsapi.org/v2/top-headlines?sources="
 news_keyboard= telegram.replykeyboardmarkup.ReplyKeyboardMarkup([[telegram.KeyboardButton("google news")],[telegram.KeyboardButton("the hindu")],
-                                                              [telegram.KeyboardButton("techcrunch")],
-                                                              [telegram.KeyboardButton("the guardian")],[telegram.KeyboardButton("the verge")],
-                                                              [telegram.KeyboardButton("new york times")],[telegram.KeyboardButton("wapo")],
-                                                              [telegram.KeyboardButton("reuters")],[telegram.KeyboardButton("ap")],
+                                                              [telegram.KeyboardButton("axios")],[telegram.KeyboardButton("the guardian")],
+                                                              [telegram.KeyboardButton("new york times")],[telegram.KeyboardButton("washington post")],
+                                                              [telegram.KeyboardButton("techcrunch")],[telegram.KeyboardButton("the verge")],
+                                                              [telegram.KeyboardButton("reuters")],
                                                               [telegram.KeyboardButton("bloomberg")],
                                                               [telegram.KeyboardButton("business insider")],
                                                               [telegram.KeyboardButton("economist")]], resize_keyboard=True)
@@ -42,21 +42,7 @@ inlineNextKeyboard2 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", ca
 inlineNextKeyboard3 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", callback_data='2')]])
 
 
-googlec = "google-news"
-thehinduc="the-hindu"
-recodec="recode"
-vergec="the-verge"
-techcrunchc="techcrunch"
-guardianc="the-guardian-uk"
-nytc="the-new-york-times"
-wapoc="the-washington-post"
-reutersc="reuters"
-apc="associated-press"
-economistc ="the-economist"
-hnc ="hacker-news"
 topnews = "&apiKey=07ce18ffbbca413289f3d57290de93e9"
-
-
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -64,7 +50,6 @@ def error(bot, update, error):
 client = pymongo.MongoClient(os.environ['MONGODB_URI'])
 
 db = client.get_default_database()
-
 
 
 users = db['users']
