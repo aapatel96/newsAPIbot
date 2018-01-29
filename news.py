@@ -15,7 +15,6 @@ from random import randint
 import pymongo
 import requests
 from newsapi import NewsApiClient
-
 try:
     import apiai
 except ImportError:
