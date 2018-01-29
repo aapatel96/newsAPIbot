@@ -14,6 +14,7 @@ import time
 from random import randint
 import pymongo
 import requests
+from newsapi import NewsApiClient
 
 try:
     import apiai
@@ -25,6 +26,7 @@ except ImportError:
 
 APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
+newsapi = NewsApiClient(api_key='07ce18ffbbca413289f3d57290de93e9')
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
 newsapi = "https://newsapi.org/v2/top-headlines?sources="
@@ -139,10 +141,11 @@ def whatNews(bot,update):
                 
             newsList = newsListformat
             
-            url = newsapi+code+topnews
-            print(url)  
-            response = urllib.request.urlopen(url)
-            data = json.loads(response.read())
+            data = newsapi.get_top_headlines(sources=code,language='en',)
+##            url = newsapi+code+topnews
+##            print(url)  
+##            response = urllib.request.urlopen(url)
+##            data = json.loads(response.read())
             
             
             newsList['code']=code
