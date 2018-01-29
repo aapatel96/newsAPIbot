@@ -26,7 +26,7 @@ except ImportError:
 
 APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
-newsapi = n.NewsApiClient(api_key='07ce18ffbbca413289f3d57290de93e9')
+newsapi = n.NewsApiClient(api_key=NEWSAPI_TOKEN)
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
 ##newsapi = "https://newsapi.org/v2/top-headlines?sources="
@@ -217,7 +217,7 @@ def nextButton(bot,update):
 
     
 def main():
-    ##PORT = int(os.environ.get('PORT', '5000'))
+    PORT = int(os.environ.get('PORT', '5000'))
     TOKEN = os.environ['BOT_TOKEN']
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(TOKEN)
@@ -245,7 +245,7 @@ def main():
                       url_path=TOKEN)
     updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
     # Start the Bot
-##    updater.start_polling()
+    updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
