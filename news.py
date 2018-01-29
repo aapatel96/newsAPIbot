@@ -14,7 +14,8 @@ import time
 from random import randint
 import pymongo
 import requests
-from newsapi.newsapi_client import NewsApiClient
+import newsapi
+##from newsapi import NewsApiClient
 try:
     import apiai
 except ImportError:
@@ -25,7 +26,7 @@ except ImportError:
 
 APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
-##newsapi = NewsApiClient(api_key='07ce18ffbbca413289f3d57290de93e9')
+newsapi = newsapi.NewsApiClient(api_key='07ce18ffbbca413289f3d57290de93e9')
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
 ##newsapi = "https://newsapi.org/v2/top-headlines?sources="
