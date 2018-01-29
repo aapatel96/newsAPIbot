@@ -14,7 +14,7 @@ import time
 from random import randint
 import pymongo
 import requests
-from newsapi import NewsApiClient
+from newsapi.newsapi_client import NewsApiClient
 try:
     import apiai
 except ImportError:
@@ -25,10 +25,10 @@ except ImportError:
 
 APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
-newsapi = NewsApiClient(api_key='07ce18ffbbca413289f3d57290de93e9')
+##newsapi = NewsApiClient(api_key='07ce18ffbbca413289f3d57290de93e9')
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
-newsapi = "https://newsapi.org/v2/top-headlines?sources="
+##newsapi = "https://newsapi.org/v2/top-headlines?sources="
 news_keyboard= telegram.replykeyboardmarkup.ReplyKeyboardMarkup([[telegram.KeyboardButton("google news")],[telegram.KeyboardButton("the hindu")],
                                                               [telegram.KeyboardButton("axios")],[telegram.KeyboardButton("the guardian")],
                                                               [telegram.KeyboardButton("new york times")],[telegram.KeyboardButton("washington post")],
@@ -43,7 +43,7 @@ inlineNextKeyboard2 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", ca
 inlineNextKeyboard3 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", callback_data='2')]])
 
 
-topnews = "&apiKey=07ce18ffbbca413289f3d57290de93e9"
+##topnews = "&apiKey=07ce18ffbbca413289f3d57290de93e9"
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -216,7 +216,6 @@ def nextButton(bot,update):
 
     
 def main():
-    print("hi")
     ##PORT = int(os.environ.get('PORT', '5000'))
     TOKEN = os.environ['BOT_TOKEN']
     # Create the EventHandler and pass it your bot's token.
