@@ -26,7 +26,7 @@ except ImportError:
 
 APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
 
-newsapi = n.NewsApiClient(api_key=NEWSAPI_TOKEN)
+newsapi = n.NewsApiClient(api_key=os.environ['NEWSAPI_TOKEN'])
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
 
 ##newsapi = "https://newsapi.org/v2/top-headlines?sources="
