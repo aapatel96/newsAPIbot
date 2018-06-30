@@ -216,7 +216,7 @@ def nextButton(bot,update):
 
 def inlinequery(bot, update):
     query = update.inline_query.query
-   	print(query)
+    print(query)
     results = list()
     query = newsapi.get_top_headlines(q=str(update.inline_query.query),page_size=20)
     for article in query['articles']:
