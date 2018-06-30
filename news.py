@@ -5,9 +5,11 @@ import sys
 
 from telegram.ext import Updater, CommandHandler, MessageHandler,ConversationHandler, Filters, Job, JobQueue, CallbackQueryHandler
 import telegram.replykeyboardmarkup
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ChatAction,InlineQueryResultArticle, ParseMode,InputTextMessageContent
+
 import telegram.keyboardbutton
 from telegram.chataction import ChatAction
+from uuid import uuid4
 
 import urllib.request
 import time
@@ -59,11 +61,7 @@ newsLists = db['newslists']
 
 
 
-# Enable logging
 
-
-
-#classes
 
 userformat = {"uid":None,"listIDs":[],"lists":[]}
 
@@ -188,15 +186,16 @@ def nextButton(bot,update):
 
     newsListIndex = newsList['index']
     
-
+    phase = 0
     if str(queryData) == "2":
-
         newsLists.update(query, {'$inc': {"index":-1}})
+        phase=-1
     if str(queryData) == "1":
-
         newsLists.update(query, {'$inc': {"index":1}})
+        phase=1
 
     newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
+    
     if newsList['index'] == 0:
         keyboard =inlineNextKeyboard1
     elif newsList['index'] == len(newsList['list'])-1:
@@ -214,6 +213,16 @@ def nextButton(bot,update):
     bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
 
     return
+
+def inlinequery(bot, update):
+    query = update.inline_query.query
+    results = list()
+    query = newsapi.get_top_headlines(q=str(update.inline_query.query),page_size=20)
+    for article in query['articles']:
+    	result = InlineQueryResultArticle(id=uuid4(),title=article["title"],input_message_content=InputTextMessageContent(article['url']),description=article["description"],thumb_url=article["urlToImage"],thumb_width=100,thumb_height=100)
+    	results.append(result)
+
+    update.inline_query.answer(results)
 
     
 def main():
@@ -235,6 +244,8 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(Filters.text, whatNews))
     dp.add_handler(CallbackQueryHandler(nextButton))
+    dp.add_handler(InlineQueryHandler(inlinequery))
+
 
     #news
 
