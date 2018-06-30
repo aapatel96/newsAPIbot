@@ -3,7 +3,7 @@ import os.path
 import os
 import sys
 
-from telegram.ext import Updater, CommandHandler, MessageHandler,ConversationHandler, Filters, Job, JobQueue, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler,ConversationHandler, Filters, Job, JobQueue, CallbackQueryHandler,InlineQueryHandler
 import telegram.replykeyboardmarkup
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ChatAction,InlineQueryResultArticle, ParseMode,InputTextMessageContent
 
