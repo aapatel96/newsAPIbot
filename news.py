@@ -17,7 +17,7 @@ from random import randint
 import pymongo
 import requests
 import newsapi as n
-##from newsapi import NewsApiClient
+
 try:
     import apiai
 except ImportError:
@@ -27,9 +27,20 @@ except ImportError:
     import apiai
 
 APIAI_CLIENT_ACCESS_TOKEN = os.environ['APIAI_CLIENT_ACCESS_TOKEN']
+NEWSAPI_TOKEN = os.environ['NEWSAPI_TOKEN']
+MONGO_URI = os.environ['MONGODB_URI']
+PORT = int(os.environ.get('PORT', '5000'))
+BOT_TOKEN = os.environ['BOT_TOKEN']
 
-newsapi = n.NewsApiClient(api_key=os.environ['NEWSAPI_TOKEN'])
+newsapi = n.NewsApiClient(api_key=NEWSAPI_TOKEN)
 ai = apiai.ApiAI(APIAI_CLIENT_ACCESS_TOKEN)
+client = pymongo.MongoClient(MONGO_URI)
+
+db = client.get_default_database()
+
+
+users = db['users']
+newsLists = db['newslists']
 
 ##newsapi = "https://newsapi.org/v2/top-headlines?sources="
 news_keyboard= telegram.replykeyboardmarkup.ReplyKeyboardMarkup([[telegram.KeyboardButton("google news")],[telegram.KeyboardButton("the hindu")],
@@ -51,13 +62,7 @@ inlineNextKeyboard3 = InlineKeyboardMarkup([[InlineKeyboardButton("previous", ca
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-client = pymongo.MongoClient(os.environ['MONGODB_URI'])
 
-db = client.get_default_database()
-
-
-users = db['users']
-newsLists = db['newslists']
 
 
 
@@ -156,7 +161,7 @@ def whatNews(bot,update):
             print(newsList)
 
             x = newsLists.insert({"code":code,"list":data['articles'],"index":0,"listID":listID,"uid":update.message.from_user.id})
-            
+            print(x)
 
             users.update({"uid":update.message.from_user.id}, {'$push':{'listIDs': listID}})
             users.update({"uid":update.message.from_user.id}, {'$push':{'listIDs': listID}})
@@ -170,6 +175,7 @@ def whatNews(bot,update):
     return
 
 def nextButton(bot,update):
+    print('hello')
     query = update.callback_query.id
     queryObj = update.callback_query
     queryData = update.callback_query.data
@@ -178,14 +184,10 @@ def nextButton(bot,update):
     listID = textComps[0][5:]
     mid = queryObj.message.message_id
     uid = queryObj.message.chat.id
-
-
     query = {"uid":queryObj.message.chat.id,"listID":listID}
     newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
-
-
     newsListIndex = newsList['index']
-    
+    print(newsListIndex)
     phase = 0
     if str(queryData) == "2":
         newsLists.update(query, {'$inc': {"index":-1}})
@@ -193,44 +195,40 @@ def nextButton(bot,update):
     if str(queryData) == "1":
         newsLists.update(query, {'$inc': {"index":1}})
         phase=1
-
     newsList = newsLists.find_one({"uid":queryObj.message.chat.id,"listID":listID})
-    
     if newsList['index'] == 0:
         keyboard =inlineNextKeyboard1
     elif newsList['index'] == len(newsList['list'])-1:
         keyboard=inlineNextKeyboard3
     else:
         keyboard=inlineNextKeyboard2
-
-        
     x = "QUERY"+str(listID)+'\n'+'\n'+newsList['list'][newsList['index']]['url']
-
-
     bot.edit_message_text(text=x,   
                       chat_id=queryObj.message.chat_id,
                       message_id=mid)
     bot.edit_message_reply_markup(chat_id =queryObj.message.chat_id,message_id=mid,reply_markup =keyboard,parse_mode='HTML')
-
     return
+
+
 
 def inlinequery(bot, update):
     query = update.inline_query.query
-    print(query)
+    if query == '':
+        query = newsapi.get_top_headlines(page_size=20)
+    else:
+        query = newsapi.get_top_headlines(q=str(update.inline_query.query),page_size=20)
     results = list()
-    query = newsapi.get_top_headlines(q=str(update.inline_query.query),page_size=20)
     for article in query['articles']:
     	result = InlineQueryResultArticle(id=uuid4(),title=article["title"],input_message_content=InputTextMessageContent(article['url']),description=article["description"],thumb_url=article["urlToImage"],thumb_width=100,thumb_height=100)
     	results.append(result)
-
     update.inline_query.answer(results)
+
 
     
 def main():
-    PORT = int(os.environ.get('PORT', '5000'))
-    TOKEN = os.environ['BOT_TOKEN']
+
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater(TOKEN)
+    updater = Updater(BOT_TOKEN)
     '''
     userslist = list(users.find())
     for user in userslist:
@@ -240,24 +238,26 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
+    dp.add_handler(InlineQueryHandler(inlinequery))
     dp.add_handler(CommandHandler("start",start,pass_job_queue=True))
     dp.add_handler(CommandHandler("start",start,pass_job_queue=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(Filters.text, whatNews))
     dp.add_handler(CallbackQueryHandler(nextButton))
-    dp.add_handler(InlineQueryHandler(inlinequery))
 
 
     #news
 
     # log all errors
     dp.add_error_handler(error)
+    
     updater.start_webhook(listen="0.0.0.0",
                       port=PORT,
                       url_path=TOKEN)
     updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+    
     # Start the Bot
-    updater.start_polling()
+    # updater.start_polling()
 
     # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
