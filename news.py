@@ -253,8 +253,8 @@ def main():
     
     updater.start_webhook(listen="0.0.0.0",
                       port=PORT,
-                      url_path=TOKEN)
-    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + TOKEN)
+                      url_path=BOT_TOKEN)
+    updater.bot.set_webhook("https://telegramnewsbot.herokuapp.com/" + BOT_TOKEN)
     
     # Start the Bot
     # updater.start_polling()
