@@ -214,9 +214,11 @@ def nextButton(bot,update):
 def inlinequery(bot, update):
     query = update.inline_query.query
     if query == '':
-        query = newsapi.get_top_headlines(page_size=20)
+        query = newsapi.get_top_headlines(language="en",page_size=20)
     else:
         query = newsapi.get_top_headlines(q=str(update.inline_query.query),page_size=20)
+        if len(query['articles'])==0:
+            query = newsapi.get_everything(q=str(update.inline_query.query),page_size=20)
     results = list()
     for article in query['articles']:
     	result = InlineQueryResultArticle(id=uuid4(),title=article["title"],input_message_content=InputTextMessageContent(article['url']),description=article["description"],thumb_url=article["urlToImage"],thumb_width=100,thumb_height=100)
