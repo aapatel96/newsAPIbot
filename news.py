@@ -128,7 +128,9 @@ def whatNews(bot,update):
         print("else statement begun")
         request = ai.text_request()
         request.session_id = update.message.chat_id
+        print(request.session_id)
         request.query = update.message.text
+        print(request.query)
         response = request.getresponse()
         JSON= json.loads(response.read().decode())
         print(JSON)
