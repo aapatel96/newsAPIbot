@@ -110,7 +110,7 @@ def herokualarm(bot,job):
     job = job.context.run_once(herokualarm, 15*60,context=job.context)
     
 def whatNews(bot,update):
-    print("yellow")
+    print("whatNews begun")
 
     try:
         userDB = users.find_one({"uid":update.message.from_user.id})
@@ -125,6 +125,7 @@ def whatNews(bot,update):
         return ConversationHandler.END
     
     else:
+        print("else statement begun")
         request = ai.text_request()
         request.session_id = update.message.chat_id
         request.query = update.message.text
