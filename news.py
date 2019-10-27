@@ -132,6 +132,7 @@ def whatNews(bot,update):
         request.query = update.message.text
         print(request.query)
         response = request.getresponse()
+        print(response)
         JSON= json.loads(response.read().decode())
         print(JSON)
         if JSON['result']['metadata']['intentName'] != 'smaug.news':
